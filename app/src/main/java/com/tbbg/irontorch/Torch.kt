@@ -33,7 +33,7 @@ object Torch {
                 Build.VERSION.SDK_INT >= 33 && max > 1 -> m.turnOnTorchWithStrengthLevel(id, level)
                 else -> m.setTorchMode(id, true)
             }
-        } catch (_: Exception) {}
+        } catch (e: Exception) {}
     }
 
     fun toggle() { sosRunning = false; on = !on; apply(); onChange?.invoke() }
