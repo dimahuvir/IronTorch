@@ -34,7 +34,7 @@ class MainActivity : Activity() {
         layoutParams = LinearLayout.LayoutParams(-1, -2).apply { topMargin = 20 }
     }
 
-    override fun onProgressChanged(b: SeekBar?, p: Int, u: Boolean) { if (u) Torch.setLevel(p + 1); refresh() }{
+    override fun onCreate(s: Bundle?) {
         super.onCreate(s)
         Torch.init(this)
         requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
@@ -62,7 +62,7 @@ class MainActivity : Activity() {
             progress = Torch.level - 1
             isEnabled = Torch.max > 1
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(b: SeekBar?, p: Int, u: Boolean) { if (u) Torch.setLevel(p + 1); refresh() }
+                override fun onProgressChanged(b: SeekBar?, p: Int, u: Boolean) { if (u) Torch.changeLevel(p + 1); refresh() }
                 override fun onStartTrackingTouch(b: SeekBar?) {}
                 override fun onStopTrackingTouch(b: SeekBar?) {}
             })
