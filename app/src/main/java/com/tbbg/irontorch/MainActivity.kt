@@ -39,7 +39,13 @@ class MainActivity : Activity() {
         Torch.init(this)
         requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
         startForegroundService(Intent(this, TorchService::class.java))
-
+        
+        val pw = getSystemService(android.os.PowerManager::class.java)
+        if (!pw.isIgnoringBatteryOptimizations(packageName)) {
+            startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                android.net.Uri.parse("package:$packageName")))
+        }
+        
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL; setPadding(40, 90, 40, 40)
             background = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
