@@ -34,7 +34,7 @@ class MainActivity : Activity() {
         layoutParams = LinearLayout.LayoutParams(-1, -2).apply { topMargin = 20 }
     }
 
-    override fun onCreate(s: Bundle?) {
+    override fun onProgressChanged(b: SeekBar?, p: Int, u: Boolean) { if (u) Torch.setLevel(p + 1); refresh() }{
         super.onCreate(s)
         Torch.init(this)
         requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
