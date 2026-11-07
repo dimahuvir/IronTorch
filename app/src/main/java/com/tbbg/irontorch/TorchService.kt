@@ -3,16 +3,23 @@ package com.tbbg.irontorch
 import android.app.*
 import android.content.*
 import android.os.IBinder
+import android.os.VibrationEffect
+import android.os.Vibrator
 
 class TorchService : Service() {
     private val hits = ArrayList<Long>()
     private val rx = object : BroadcastReceiver() {
         override fun onReceive(c: Context, i: Intent) {
-            // 1 нажатие питания = 1 событие экрана (вкл/выкл). 3 события за 2 сек = тройное нажатие
+            // 1 нажатие питания = 1 событие экрана (вкл/выкл). 3 события за 3 сек = тройное нажатие
             val now = System.currentTimeMillis()
             hits.add(now)
-            hits.removeAll { now - it > 2000 }
-            if (hits.size >= 3) { hits.clear(); Torch.toggle() }
+            hits.removeAll { now - it > 3000 }
+            if (hits.size >= 3) {
+                hits.clear()
+                getSystemService(Vibrator::class.java)
+                    .vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE))
+                Torch.toggle()
+            }
         }
     }
 
