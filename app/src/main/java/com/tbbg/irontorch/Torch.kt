@@ -44,7 +44,7 @@ object Torch {
         onChange?.invoke()
     }
 
-    fun changeLevel: Int) { level = l.coerceIn(1, max); if (on) apply() }
+    fun changeLevel(l: Int) { level = l.coerceIn(1, max); if (on) apply() }
 
     var onChange: (() -> Unit)? = null
 
