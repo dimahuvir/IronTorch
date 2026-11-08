@@ -10,8 +10,14 @@ object Torch {
     var level = 1
     var max = 1
     @Volatile var sosRunning = false
+    @Volatile var alarmRunning = false
+    private var saved = false
+    private var gen = 0
     private var cm: CameraManager? = null
     private var id = ""
+
+    val active: Boolean get() = on || sosRunning || alarmRunning
+    val steady: Boolean get() = on && !sosRunning && !alarmRunning
 
     fun init(c: Context) {
         if (cm != null) return
@@ -36,7 +42,19 @@ object Torch {
         } catch (e: Exception) {}
     }
 
-    fun toggle() { sosRunning = false; on = !on; apply(); onChange?.invoke() }
+    fun stopEffects() {
+        sosRunning = false
+        alarmRunning = false
+        Sounds.siren(false)
+    }
+
+    fun toggle() {
+        if (sosRunning || alarmRunning) { stopEffects(); return }
+        on = !on
+        apply()
+        if (!on) Sounds.stopPing()
+        onChange?.invoke()
+    }
 
     fun step(dir: Int) {
         level = (level + dir * maxOf(1, max / 6)).coerceIn(1, max)
@@ -50,21 +68,44 @@ object Torch {
 
     // SOS по морзе: ... --- ...
     fun sos() {
-        if (sosRunning) { sosRunning = false; return }
+        if (sosRunning) { stopEffects(); return }
+        if (!alarmRunning) saved = on
+        stopEffects()
         sosRunning = true
+        val g = ++gen
+        onChange?.invoke()
         Thread {
             val code = "...---..."
-            val was = on
-            while (sosRunning) {
+            while (sosRunning && g == gen) {
                 for ((i, ch) in code.withIndex()) {
-                    if (!sosRunning) break
+                    if (!sosRunning || g != gen) break
                     on = true; apply(); Thread.sleep(if (ch == '.') 200 else 600)
                     on = false; apply(); Thread.sleep(200)
                     if (i % 3 == 2) Thread.sleep(400)
                 }
                 Thread.sleep(1200)
             }
-            on = was; apply()
+            if (g == gen && !sosRunning && !alarmRunning) { on = saved; apply() }
+            onChange?.invoke()
+        }.start()
+    }
+
+    // Сигнализация: сирена + быстрый стробоскоп
+    fun alarm() {
+        if (alarmRunning) { stopEffects(); return }
+        if (!sosRunning) saved = on
+        stopEffects()
+        alarmRunning = true
+        val g = ++gen
+        Sounds.siren(true)
+        onChange?.invoke()
+        Thread {
+            while (alarmRunning && g == gen) {
+                on = true; apply(); Thread.sleep(110)
+                on = false; apply(); Thread.sleep(110)
+            }
+            if (g == gen && !sosRunning && !alarmRunning) { on = saved; apply() }
+            onChange?.invoke()
         }.start()
     }
 }
