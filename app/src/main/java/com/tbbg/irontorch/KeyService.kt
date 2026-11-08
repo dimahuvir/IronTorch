@@ -11,7 +11,7 @@ class KeyService : AccessibilityService() {
 
     // Громкость меняет яркость только когда фонарь включён
     override fun onKeyEvent(e: KeyEvent): Boolean {
-        if (!Torch.on) return false
+                if (!Torch.on || Torch.max <= 1) return false
         val dir = when (e.keyCode) {
             KeyEvent.KEYCODE_VOLUME_UP -> 1
             KeyEvent.KEYCODE_VOLUME_DOWN -> -1
