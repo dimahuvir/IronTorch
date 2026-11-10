@@ -9,6 +9,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Gravity
+import android.view.View
 import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -16,6 +17,8 @@ import android.widget.Toast
 
 class MainActivity : Activity() {
     private lateinit var design: DesignView
+    private lateinit var root: LinearLayout
+    private lateinit var sig: TextView
 
     private fun openField() {
         val pm = packageManager
@@ -42,10 +45,18 @@ class MainActivity : Activity() {
         }
     }
 
+    // RED LIGHT: ярко-красный экран на максимальной яркости
     private fun setRed(on: Boolean) {
         val a = window.attributes
-        a.screenBrightness = if (on) 0.05f else WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+        a.screenBrightness = if (on) 1f else WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
         window.attributes = a
+        if (on) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        val c = if (on) Color.rgb(255, 0, 0) else Color.parseColor("#0F100B")
+        window.statusBarColor = c
+        window.navigationBarColor = c
+        root.setBackgroundColor(c)
+        sig.visibility = if (on) View.GONE else View.VISIBLE
     }
 
     override fun onCreate(s: Bundle?) {
@@ -72,7 +83,7 @@ class MainActivity : Activity() {
             onRed = { on -> setRed(on) }
         }
 
-        val sig = TextView(this).apply {
+        sig = TextView(this).apply {
             text = "— By TBBG —"
             textSize = 15f
             setTextColor(Color.parseColor("#B8C400"))
@@ -80,7 +91,7 @@ class MainActivity : Activity() {
             typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
             setPadding(0, 12, 0, 16)
         }
-        val root = LinearLayout(this).apply {
+        root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(Color.parseColor("#0F100B"))
             addView(design)
