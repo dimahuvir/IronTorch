@@ -25,7 +25,8 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
     private var sc = 1f
     private var dx = 0f
     private var dy = 0f
-    private val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { isFilterBitmap = true }
+    private val bp = Paint(Paint.FILTER_BITMAP_FLAG)
+    private val p = Paint(Paint.ANTI_ALIAS_FLAG)
     private val label = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create("sans-serif-condensed", Typeface.BOLD)
@@ -76,13 +77,23 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
     }
 
     override fun onDraw(cv: Canvas) {
+        if (redMode) {
+            cv.drawColor(Color.rgb(255, 0, 0))
+            label.color = Color.rgb(110, 0, 0)
+            label.textSize = 56f
+            cv.drawText("RED LIGHT", width / 2f, height / 2f, label)
+            label.textSize = 28f
+            cv.drawText("Коснись экрана, чтобы выйти", width / 2f, height / 2f + 60f, label)
+            return
+        }
+
         sc = maxOf(width / bmp.width.toFloat(), height / bmp.height.toFloat())
         dx = (width - bmp.width * sc) / 2f
         dy = (height - bmp.height * sc) / 2f
         cv.save()
         cv.translate(dx, dy)
         cv.scale(sc, sc)
-        cv.drawBitmap(bmp, 0f, 0f, p)
+        cv.drawBitmap(bmp, 0f, 0f, bp)
 
         val lit = Torch.active
         if (lit) {
@@ -90,6 +101,7 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
                 moveTo(CX - 150f, 544f); lineTo(CX + 150f, 544f)
                 lineTo(CX + 340f, 205f); lineTo(CX - 340f, 205f); close()
             }
+            p.style = Paint.Style.FILL
             p.shader = LinearGradient(0f, 544f, 0f, 205f,
                 Color.argb(235, 255, 255, 235), Color.argb(0, 255, 255, 235), Shader.TileMode.CLAMP)
             cv.drawPath(beam, p)
@@ -103,7 +115,6 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
             Torch.max > 1 && Torch.on && Torch.level == Torch.max,
             Torch.alarmRunning, Torch.sosRunning, false
         )
-        p.style = Paint.Style.FILL
         for (i in zones.indices) {
             if (active[i]) {
                 p.style = Paint.Style.FILL
@@ -113,14 +124,15 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
                 p.strokeWidth = 7f
                 p.color = YEL
                 cv.drawRoundRect(zones[i], 26f, 26f, p)
-                p.style = Paint.Style.FILL
             }
             if (pressed == i) {
+                p.style = Paint.Style.FILL
                 p.color = Color.argb(60, 255, 255, 255)
                 cv.drawRoundRect(zones[i], 26f, 26f, p)
             }
         }
         if (pressed == 10) {
+            p.style = Paint.Style.FILL
             p.color = Color.argb(50, 255, 255, 200)
             cv.drawCircle(CX, CY, 190f, p)
         }
@@ -135,14 +147,5 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
         label.color = if (lit) YEL else Color.parseColor("#7C7C45")
         cv.drawText(text, 425f, 1095f + label.textSize * 0.35f, label)
         cv.restore()
-
-        if (redMode) {
-            cv.drawColor(Color.rgb(80, 0, 0))
-            label.color = Color.rgb(255, 60, 60)
-            label.textSize = 56f
-            cv.drawText("RED LIGHT", width / 2f, height / 2f, label)
-            label.textSize = 28f
-            cv.drawText("Коснись экрана, чтобы выйти", width / 2f, height / 2f + 60f, label)
-        }
     }
 }
