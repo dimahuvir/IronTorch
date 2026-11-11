@@ -146,15 +146,7 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
         label.textSize = if (text.length > 3) 46f else 64f
         label.color = if (lit) YEL else Color.parseColor("#7C7C45")
         cv.drawText(text, 425f, 1187f + label.textSize * 0.35f, label)
-
-        label.letterSpacing = 0.14f
-        label.textSize = 40f
-        label.color = Color.argb(200, 0, 0, 0)
-        cv.drawText("BY TBBG", 428f, 1808f, label)
-        label.color = Color.rgb(140, 135, 80)
-        cv.drawText("BY TBBG", 426f, 1806f, label)
-        label.letterSpacing = 0f
-
+        
         cv.restore()
     }
 }
