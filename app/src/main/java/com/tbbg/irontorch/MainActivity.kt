@@ -54,7 +54,7 @@ class MainActivity : Activity() {
         window.navigationBarColor = Color.TRANSPARENT
         window.decorView.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-            View.SYSTEM_UI_FLAG_LAYOUT_FULL_SCREEN or
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
             View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
     }
 
@@ -70,22 +70,4 @@ class MainActivity : Activity() {
         }
         fullScreen()
 
-        design = DesignView(this, BitmapFactory.decodeResource(resources, R.drawable.design)).apply {
-            onInfo = {
-                Toast.makeText(this@MainActivity,
-                    "IRON TORCH\n3x кнопка питания = фонарь\nBy TBBG", Toast.LENGTH_LONG).show()
-            }
-            onGear = { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
-            onBright = { bright() }
-            onRed = { on -> setRed(on) }
-        }
-        setContentView(design)
-        Torch.onChange = { runOnUiThread { design.invalidate() } }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        fullScreen()
-        design.invalidate()
-    }
-}
+        design = DesignView(thi
