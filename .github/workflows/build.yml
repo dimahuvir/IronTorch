@@ -9,6 +9,12 @@ jobs:
         with: { distribution: temurin, java-version: 17 }
       - uses: gradle/actions/setup-gradle@v4
         with: { gradle-version: 8.7 }
-      - run: gradle assembleDebug
+      - name: Build debug APK
+        run: |
+          set -o pipefail
+          gradle assembleDebug --no-daemon 2>&1 | tee build.log
       - uses: actions/upload-artifact@v4
         with: { name: IronTorch-APK, path: app/build/outputs/apk/debug/*.apk }
+      - name: Show errors
+        if: failure()
+        run: grep -hE "^e: |error:|AAPT|What went wrong|Execution failed" -A2 build.log | head -40
