@@ -14,6 +14,10 @@ import android.widget.Toast
 class MainActivity : Activity() {
     private lateinit var design: DesignView
 
+    private fun toast(t: String) {
+        Toast.makeText(this, t, Toast.LENGTH_LONG).show()
+    }
+
     private fun openField() {
         val pm = packageManager
         val i = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
@@ -23,7 +27,7 @@ class MainActivity : Activity() {
         }
         val launch = app?.let { pm.getLaunchIntentForPackage(it.activityInfo.packageName) }
         if (launch == null) {
-            Toast.makeText(this, "Системный полевой фонарь не найден", Toast.LENGTH_LONG).show()
+            toast("Системный полевой фонарь не найден")
         } else {
             startActivity(launch)
         }
@@ -71,5 +75,18 @@ class MainActivity : Activity() {
         fullScreen()
 
         design = DesignView(this, BitmapFactory.decodeResource(resources, R.drawable.design)).apply {
-            onInfo = {
-                Toast.makeText(th
+            onInfo = { toast("IRON TORCH\n3x кнопка питания = фонарь\nBy TBBG") }
+            onGear = { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
+            onBright = { bright() }
+            onRed = { on -> setRed(on) }
+        }
+        setContentView(design)
+        Torch.onChange = { runOnUiThread { design.invalidate() } }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        fullScreen()
+        design.invalidate()
+    }
+}
