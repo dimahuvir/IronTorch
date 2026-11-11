@@ -5,20 +5,14 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
 import android.provider.Settings
-import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 
 class MainActivity : Activity() {
     private lateinit var design: DesignView
-    private lateinit var root: LinearLayout
-    private lateinit var sig: TextView
 
     private fun openField() {
         val pm = packageManager
@@ -52,11 +46,16 @@ class MainActivity : Activity() {
         window.attributes = a
         if (on) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val c = if (on) Color.rgb(255, 0, 0) else Color.parseColor("#0F100B")
-        window.statusBarColor = c
-        window.navigationBarColor = c
-        root.setBackgroundColor(c)
-        sig.visibility = if (on) View.GONE else View.VISIBLE
+    }
+
+    // картинка на весь экран, под прозрачными системными панелями
+    private fun fullScreen() {
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+        window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+            View.SYSTEM_UI_FLAG_LAYOUT_FULL_SCREEN or
+            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
     }
 
     override fun onCreate(s: Bundle?) {
@@ -69,11 +68,9 @@ class MainActivity : Activity() {
             startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
                 android.net.Uri.parse("package:$packageName")))
         }
-        window.statusBarColor = Color.parseColor("#0F100B")
-        window.navigationBarColor = Color.parseColor("#0F100B")
+        fullScreen()
 
         design = DesignView(this, BitmapFactory.decodeResource(resources, R.drawable.design)).apply {
-            layoutParams = LinearLayout.LayoutParams(-1, 0, 1f)
             onInfo = {
                 Toast.makeText(this@MainActivity,
                     "IRON TORCH\n3x кнопка питания = фонарь\nBy TBBG", Toast.LENGTH_LONG).show()
@@ -82,27 +79,13 @@ class MainActivity : Activity() {
             onBright = { bright() }
             onRed = { on -> setRed(on) }
         }
-
-        sig = TextView(this).apply {
-            text = "— By TBBG —"
-            textSize = 15f
-            setTextColor(Color.parseColor("#B8C400"))
-            gravity = Gravity.CENTER
-            typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
-            setPadding(0, 12, 0, 16)
-        }
-        root = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setBackgroundColor(Color.parseColor("#0F100B"))
-            addView(design)
-            addView(sig)
-        }
-        setContentView(root)
+        setContentView(design)
         Torch.onChange = { runOnUiThread { design.invalidate() } }
     }
 
     override fun onResume() {
         super.onResume()
+        fullScreen()
         design.invalidate()
     }
 }
