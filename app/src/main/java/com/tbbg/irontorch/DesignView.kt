@@ -146,7 +146,7 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
         label.textSize = if (text.length > 3) 46f else 64f
         label.color = if (lit) YEL else Color.parseColor("#7C7C45")
         cv.drawText(text, 425f, 1187f + label.textSize * 0.35f, label)
-        
+
         cv.restore()
     }
 }
