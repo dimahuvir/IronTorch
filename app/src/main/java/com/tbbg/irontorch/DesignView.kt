@@ -14,12 +14,12 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
 
     private val YEL = Color.parseColor("#E6F000")
     private val CX = 426f
-    private val CY = 796f
+    private val CY = 888f
     private val zones = listOf(
-        RectF(78f, 1188f, 410f, 1330f),
-        RectF(443f, 1188f, 775f, 1330f),
-        RectF(78f, 1355f, 410f, 1496f),
-        RectF(443f, 1355f, 775f, 1496f)
+        RectF(78f, 1280f, 410f, 1422f),
+        RectF(443f, 1280f, 775f, 1422f),
+        RectF(78f, 1447f, 410f, 1588f),
+        RectF(443f, 1447f, 775f, 1588f)
     )
     private var pressed = -1
     private var sc = 1f
@@ -40,8 +40,8 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
         val iy = (y - dy) / sc
         for (i in zones.indices) if (zones[i].contains(ix, iy)) return i
         if (near(ix, iy, CX, CY, 250f)) return 10
-        if (near(ix, iy, 62f, 111f, 55f)) return 11
-        if (near(ix, iy, 788f, 111f, 55f)) return 12
+        if (near(ix, iy, 62f, 203f, 55f)) return 11
+        if (near(ix, iy, 788f, 203f, 55f)) return 12
         return -1
     }
 
@@ -98,11 +98,11 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
         val lit = Torch.active
         if (lit) {
             val beam = Path().apply {
-                moveTo(CX - 150f, 544f); lineTo(CX + 150f, 544f)
-                lineTo(CX + 340f, 205f); lineTo(CX - 340f, 205f); close()
+                moveTo(CX - 150f, 636f); lineTo(CX + 150f, 636f)
+                lineTo(CX + 340f, 297f); lineTo(CX - 340f, 297f); close()
             }
             p.style = Paint.Style.FILL
-            p.shader = LinearGradient(0f, 544f, 0f, 205f,
+            p.shader = LinearGradient(0f, 636f, 0f, 297f,
                 Color.argb(235, 255, 255, 235), Color.argb(0, 255, 255, 235), Shader.TileMode.CLAMP)
             cv.drawPath(beam, p)
             p.shader = RadialGradient(CX, CY, 300f,
@@ -145,7 +145,16 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
         }
         label.textSize = if (text.length > 3) 46f else 64f
         label.color = if (lit) YEL else Color.parseColor("#7C7C45")
-        cv.drawText(text, 425f, 1095f + label.textSize * 0.35f, label)
+        cv.drawText(text, 425f, 1187f + label.textSize * 0.35f, label)
+
+        label.letterSpacing = 0.14f
+        label.textSize = 40f
+        label.color = Color.argb(200, 0, 0, 0)
+        cv.drawText("BY TBBG", 428f, 1808f, label)
+        label.color = Color.rgb(140, 135, 80)
+        cv.drawText("BY TBBG", 426f, 1806f, label)
+        label.letterSpacing = 0f
+
         cv.restore()
     }
 }
