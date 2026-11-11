@@ -70,4 +70,6 @@ class MainActivity : Activity() {
         }
         fullScreen()
 
-        design = DesignView(thi
+        design = DesignView(this, BitmapFactory.decodeResource(resources, R.drawable.design)).apply {
+            onInfo = {
+                Toast.makeText(th
