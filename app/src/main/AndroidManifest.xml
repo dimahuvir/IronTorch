@@ -11,12 +11,20 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:label="IRON TORCH"
         android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
-        <activity android:name=".MainActivity" android:exported="true">
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <service android:name=".TorchService" android:exported="false" android:foregroundServiceType="specialUse">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="flashlight"/>
         </service>
