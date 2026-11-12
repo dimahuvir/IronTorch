@@ -8,9 +8,8 @@ import android.view.View
 class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
     var onInfo: () -> Unit = {}
     var onGear: () -> Unit = {}
-    var onBright: () -> Unit = {}
-    var onRed: (Boolean) -> Unit = {}
-    var redMode = false
+    var onScreen: (Boolean) -> Unit = {}
+    var screenMode = 0   // 0 - обычный вид, 1 - красный экран, 2 - белый экран
 
     private val YEL = Color.parseColor("#E6F000")
     private val CX = 426f
@@ -47,12 +46,12 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
 
     private fun act(id: Int) {
         when (id) {
-            99 -> { redMode = false; onRed(false) }
+            99 -> { screenMode = 0; onScreen(false) }
             10 -> Torch.toggle()
-            0 -> onBright()
+            0 -> { screenMode = 2; onScreen(true) }
             1 -> Torch.alarm()
             2 -> Torch.sos()
-            3 -> { redMode = true; onRed(true) }
+            3 -> { screenMode = 1; onScreen(true) }
             11 -> onInfo()
             12 -> onGear()
         }
@@ -62,11 +61,11 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
     override fun onTouchEvent(e: MotionEvent): Boolean {
         when (e.action) {
             MotionEvent.ACTION_DOWN -> {
-                pressed = if (redMode) 99 else hit(e.x, e.y)
+                pressed = if (screenMode != 0) 99 else hit(e.x, e.y)
                 invalidate()
             }
             MotionEvent.ACTION_UP -> {
-                val h = if (redMode) 99 else hit(e.x, e.y)
+                val h = if (screenMode != 0) 99 else hit(e.x, e.y)
                 if (h == pressed && h != -1) act(h)
                 pressed = -1
                 invalidate()
@@ -77,7 +76,14 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
     }
 
     override fun onDraw(cv: Canvas) {
-        if (redMode) {
+        if (screenMode == 2) {
+            cv.drawColor(Color.WHITE)
+            label.color = Color.rgb(185, 185, 185)
+            label.textSize = 26f
+            cv.drawText("Коснись экрана, чтобы выйти", width / 2f, height - 90f, label)
+            return
+        }
+        if (screenMode == 1) {
             cv.drawColor(Color.rgb(255, 0, 0))
             label.color = Color.rgb(110, 0, 0)
             label.textSize = 56f
@@ -111,10 +117,7 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
             p.shader = null
         }
 
-        val active = booleanArrayOf(
-            Torch.max > 1 && Torch.on && Torch.level == Torch.max,
-            Torch.alarmRunning, Torch.sosRunning, false
-        )
+        val active = booleanArrayOf(false, Torch.alarmRunning, Torch.sosRunning, false)
         for (i in zones.indices) {
             if (active[i]) {
                 p.style = Paint.Style.FILL
