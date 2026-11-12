@@ -136,9 +136,7 @@ class MainActivity : Activity() {
         design = DesignView(this, BitmapFactory.decodeResource(resources, R.drawable.design)).apply {
             onInfo = { showInfo() }
             onGear = { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
-            onScreen = { on: Boolean -> setScreen(on) }
-            onBright = { on: Boolean -> setScreen(on) }
-            onRed = { on: Boolean -> setScreen(on) }
+            onScreen = { on -> setScreen(on) }
         }
         setContentView(design)
         Torch.onChange = { runOnUiThread { design.invalidate() } }
