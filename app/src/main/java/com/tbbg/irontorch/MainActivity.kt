@@ -114,7 +114,7 @@ class MainActivity : Activity() {
     // картинка на весь экран, под прозрачными системными панелями
     private fun fullScreen() {
         window.statusBarColor = Color.TRANSPARENT
-        window.navigationBarColor = Color.TRANSPAREnt
+        window.navigationBarColor = Color.TRANSPARENT
         window.decorView.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
@@ -137,7 +137,6 @@ class MainActivity : Activity() {
             onInfo = { showInfo() }
             onGear = { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
             onScreen = { on: Boolean -> setScreen(on) }
-            // ИСПРАВЛЕНИЕ: Используем правильные имена событий и явно указываем типы параметров
             onBright = { on: Boolean -> setScreen(on) }
             onRed = { on: Boolean -> setScreen(on) }
         }
