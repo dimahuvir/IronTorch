@@ -18,13 +18,7 @@ import android.widget.TextView
 class LaunchActivity : Activity() {
 
     private fun goNext() {
-        try {
-            val i = Intent()
-            i.setClassName(this, "com.tbbg.irontorch.SplashActivity")
-            startActivity(i)
-        } catch (e: Exception) {
-            startActivity(Intent(this, MainActivity::class.java))
-        }
+        startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
 
