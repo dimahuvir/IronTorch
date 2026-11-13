@@ -14,6 +14,7 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
     private val YEL = Color.parseColor("#E6F000")
     private val CX = 426f
     private val CY = 888f
+    // 0 BRIGHT, 1 RED LIGHT (верхний ряд), 2 SOS, 3 STROBE (нижний ряд)
     private val zones = listOf(
         RectF(78f, 1280f, 410f, 1422f),
         RectF(443f, 1280f, 775f, 1422f),
@@ -49,9 +50,9 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
             99 -> { screenMode = 0; onScreen(false) }
             10 -> Torch.toggle()
             0 -> { screenMode = 2; onScreen(true) }
-            1 -> Torch.alarm()
+            1 -> { screenMode = 1; onScreen(true) }
             2 -> Torch.sos()
-            3 -> { screenMode = 1; onScreen(true) }
+            3 -> Torch.alarm()
             11 -> onInfo()
             12 -> onGear()
         }
@@ -117,7 +118,7 @@ class DesignView(c: Context, private val bmp: Bitmap) : View(c) {
             p.shader = null
         }
 
-        val active = booleanArrayOf(false, Torch.alarmRunning, Torch.sosRunning, false)
+        val active = booleanArrayOf(false, false, Torch.sosRunning, Torch.alarmRunning)
         for (i in zones.indices) {
             if (active[i]) {
                 p.style = Paint.Style.FILL
