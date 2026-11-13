@@ -10,11 +10,11 @@ class TorchService : Service() {
     private val hits = ArrayList<Long>()
     private val rx = object : BroadcastReceiver() {
         override fun onReceive(c: Context, i: Intent) {
-            // 1 нажатие питания = 1 событие экрана (вкл/выкл). 3 события за 3 сек = тройное нажатие
+            // каждое нажатие питания даёт событие экрана; два события за секунду = двойное нажатие
             val now = System.currentTimeMillis()
             hits.add(now)
-            hits.removeAll { now - it > 3000 }
-            if (hits.size >= 3) {
+            hits.removeAll { now - it > 1000 }
+            if (hits.size >= 2) {
                 hits.clear()
                 getSystemService(Vibrator::class.java)
                     .vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE))
@@ -31,7 +31,7 @@ class TorchService : Service() {
         val n = Notification.Builder(this, "it")
             .setSmallIcon(android.R.drawable.ic_lock_idle_low_battery)
             .setContentTitle("☠ IRON TORCH НА ПОСТУ")
-            .setContentText("3x кнопка питания = фонарь | By TBBG")
+            .setContentText("2x кнопка питания = фонарь | By TBBG")
             .setContentIntent(PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE))
             .build()
         startForeground(1, n)
