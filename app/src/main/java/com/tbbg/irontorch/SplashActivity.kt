@@ -43,21 +43,22 @@ class SplashView(c: Context) : View(c) {
     private val word = BitmapFactory.decodeResource(resources, R.drawable.tbbg)
     private val p = Paint(Paint.ANTI_ALIAS_FLAG)
     private val bp = Paint(Paint.FILTER_BITMAP_FLAG)
-    private val body = Paint(Paint.FILTER_BITMAP_FLAG).apply {
-        colorFilter = PorterDuffColorFilter(Color.rgb(8, 10, 6), PorterDuff.Mode.SRC_IN)
-    }
-    private val halo = Paint(Paint.FILTER_BITMAP_FLAG).apply {
-        colorFilter = PorterDuffColorFilter(Color.rgb(78, 92, 50), PorterDuff.Mode.SRC_IN)
+    private val body = Paint(Paint.FILTER_BITMAP_FLAG)
+    private val tp = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
+        textSize = 108f
+        letterSpacing = 0.05f
     }
     private val beamPath = Path()
     private val start = System.currentTimeMillis()
     private var finished = false
 
-    private val MS = 0.70f
-    private val MX = 14f
+    private val TITLE = "IRON TORCH"
+    private val MS = 0.62f
+    private val MX = 30f
     private val MY = 1760f - man.height * MS
-    private val TX = MX + 550.1f * MS
-    private val TY = MY + 330.1f * MS
+    private val TX = MX + 677.3f * MS
+    private val TY = MY + 264.5f * MS
     private val WX = 660f
     private val WY = 1060f
     private val WW = 330f
@@ -69,12 +70,12 @@ class SplashView(c: Context) : View(c) {
 
     // мигание фонаря: два коротких включения, потом ровный свет
     private fun beam(t: Float): Float = when {
-        t < 960f -> 0f
-        t < 1010f -> 0.9f
-        t < 1060f -> 0.1f
-        t < 1110f -> 1f
-        t < 1170f -> 0.3f
-        t < 1500f -> 0.3f + 0.7f * (t - 1170f) / 330f
+        t < 1500f -> 0f
+        t < 1550f -> 0.9f
+        t < 1600f -> 0.1f
+        t < 1650f -> 1f
+        t < 1710f -> 0.3f
+        t < 2040f -> 0.3f + 0.7f * (t - 1710f) / 330f
         else -> 1f
     }
 
@@ -93,13 +94,30 @@ class SplashView(c: Context) : View(c) {
         p.color = Color.argb((255 * (0.55f - 0.30f * b)).toInt(), 0, 0, 0)
         cv.drawRect(0f, 0f, W, H, p)
 
+        // название печатается как на машинке
+        val n = ((t - 300f) / 100f).toInt().coerceIn(0, TITLE.length)
+        val full = tp.measureText(TITLE)
+        val x0 = (W - full) / 2f
+        val y0 = 640f
+        val shown = TITLE.substring(0, n)
+        if (n > 0) {
+            tp.color = Color.argb(200, 0, 0, 0)
+            cv.drawText(shown, x0 + 5f, y0 + 5f, tp)
+            tp.color = Color.rgb(236, 208, 98)
+            cv.drawText(shown, x0, y0, tp)
+        }
+        val typing = n < TITLE.length
+        if (t > 100f && t < 3300f && (typing || ((t / 350f).toInt() % 2 == 0))) {
+            tp.color = Color.rgb(236, 208, 98)
+            cv.drawText("_", x0 + tp.measureText(shown), y0, tp)
+        }
+
         // солдат
         val a = (t / 600f).coerceIn(0f, 1f)
         val rise = (1f - a) * 24f
         val dst = RectF(MX, MY + rise, MX + man.width * MS, MY + rise + man.height * MS)
-        val hd = RectF(dst.left - 5f, dst.top - 5f, dst.right + 5f, dst.bottom + 5f)
-        halo.alpha = (110 * a).toInt()
-        cv.drawBitmap(man, null, hd, halo)
+        val m = (255 * (0.50f + 0.50f * b)).toInt()
+        body.colorFilter = LightingColorFilter(Color.rgb(m, m, m), 0)
         body.alpha = (255 * a).toInt()
         cv.drawBitmap(man, null, dst, body)
 
@@ -128,7 +146,7 @@ class SplashView(c: Context) : View(c) {
         }
 
         // надпись TBBG проявляется в свете луча
-        val ta = b * smooth((t - 1100f) / 900f)
+        val ta = b * smooth((t - 1640f) / 900f)
         if (ta > 0f) {
             p.shader = RadialGradient(WX, WY, 280f,
                 Color.argb(130, 230, 240, 0), Color.argb(0, 230, 240, 0), Shader.TileMode.CLAMP)
@@ -145,12 +163,12 @@ class SplashView(c: Context) : View(c) {
         cv.restore()
 
         // затемнение и переход в приложение
-        if (t > 3000f) {
+        if (t > 3400f) {
             p.shader = null
-            p.color = Color.argb((255 * ((t - 3000f) / 400f).coerceIn(0f, 1f)).toInt(), 0, 0, 0)
+            p.color = Color.argb((255 * ((t - 3400f) / 400f).coerceIn(0f, 1f)).toInt(), 0, 0, 0)
             cv.drawRect(0f, 0f, width.toFloat(), height.toFloat(), p)
         }
-        if (t >= 3400f) {
+        if (t >= 3800f) {
             if (!finished) {
                 finished = true
                 post { onDone() }
