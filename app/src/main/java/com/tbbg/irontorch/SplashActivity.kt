@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.*
+import android.media.AudioTrack
 import android.os.Bundle
 import android.view.View
 
@@ -50,8 +51,9 @@ class SplashView(c: Context) : View(c) {
         letterSpacing = 0.05f
     }
     private val beamPath = Path()
-    private val start = System.currentTimeMillis()
+    private var start = 0L
     private var finished = false
+    private var audio: AudioTrack? = null
 
     private val TITLE = "IRON TORCH"
     private val MS = 0.62f
@@ -62,6 +64,28 @@ class SplashView(c: Context) : View(c) {
     private val WX = 660f
     private val WY = 1060f
     private val WW = 330f
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        try {
+            audio = Sfx.player(Sfx.buildSplash())
+            audio?.play()
+        } catch (e: Exception) {
+        }
+        // картинка стартует чуть позже звука: у звука есть небольшая задержка
+        start = System.currentTimeMillis() + 70L
+        invalidate()
+    }
+
+    override fun onDetachedFromWindow() {
+        try {
+            audio?.stop()
+            audio?.release()
+        } catch (e: Exception) {
+        }
+        audio = null
+        super.onDetachedFromWindow()
+    }
 
     private fun smooth(x: Float): Float {
         val c = x.coerceIn(0f, 1f)
@@ -80,7 +104,7 @@ class SplashView(c: Context) : View(c) {
     }
 
     override fun onDraw(cv: Canvas) {
-        val t = (System.currentTimeMillis() - start).toFloat()
+        val t = (System.currentTimeMillis() - start).toFloat().coerceAtLeast(0f)
         val sc = maxOf(width / W, height / H)
         cv.save()
         cv.translate((width - W * sc) / 2f, (height - H * sc) / 2f)
