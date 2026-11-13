@@ -18,7 +18,7 @@ import android.widget.TextView
 class LaunchActivity : Activity() {
 
     private fun goNext() {
-        startActivity(Intent(this, MainActivity::class.java))
+        startActivity(Intent(this, SplashActivity::class.java))
         finish()
     }
 
